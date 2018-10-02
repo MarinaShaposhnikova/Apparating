@@ -1,0 +1,21 @@
+apply plugin: 'com.android.library'
+
+apply plugin: 'kotlin-android-extensions'
+
+apply plugin: 'kotlin-android'
+
+apply from: '../gradle/dependencies.gradle'
+
+apply from: '../gradle/androidConfig.gradle'
+
+androidExtensions {
+    experimental = true
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation kotlinDependencies.values()
+    implementation retrofitDependencies.values()
+    implementation gson
+    implementation koin
+}
