@@ -5,5 +5,5 @@ import org.koin.dsl.module.Module
 import org.koin.dsl.module.applicationContext
 
 val homeModule: Module = applicationContext {
-    viewModel { HomeViewModel(get()) }
+    viewModel { HomeViewModel(get(), get()) }
 }

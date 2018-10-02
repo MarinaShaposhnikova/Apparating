@@ -5,5 +5,5 @@ import org.koin.dsl.module.Module
 import org.koin.dsl.module.applicationContext
 
 val mapModule: Module = applicationContext {
-    viewModel { MapViewModel(get()) }
+    viewModel { MapViewModel(get(), get()) }
 }

@@ -2,20 +2,20 @@ package com.meier.marina.mytaxi.home
 
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.ViewModel
-import com.meier.marina.mytaxi.utils.BG
 import com.meier.marina.network.repo.VehicleRepository
-import kotlinx.coroutines.launch
 import com.meier.marina.mytaxi.State
-import kotlinx.coroutines.GlobalScope
+import com.meier.marina.mytaxi.utils.BaseScopeHandler
+import kotlinx.coroutines.*
 
 class HomeViewModel(
+    private val handler: BaseScopeHandler,
     private val repo: VehicleRepository
 ) : ViewModel() {
 
     val liveData = MutableLiveData<State>()
 
     init {
-        GlobalScope.launch(BG) {
+        handler.launch {
             try {
                 val list = repo.getListVehicle(p1Lat, p1Lon, p2Lat, p2Lon)
                 liveData.postValue(State.Success(list))
@@ -24,6 +24,11 @@ class HomeViewModel(
                 liveData.postValue(State.Error("Ooops, something went wrong"))
             }
         }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        handler.cancel()
     }
 }
 

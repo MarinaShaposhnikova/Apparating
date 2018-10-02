@@ -5,16 +5,16 @@ import android.arch.lifecycle.ViewModel
 import com.google.android.gms.maps.model.LatLngBounds
 import com.meier.marina.mytaxi.State
 
-import com.meier.marina.mytaxi.utils.BG
+import com.meier.marina.mytaxi.utils.BaseScopeHandler
 import com.meier.marina.mytaxi.utils.throttle
 import com.meier.marina.network.repo.VehicleRepository
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.SendChannel
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.launch
 
 class MapViewModel(
+    private val handler: BaseScopeHandler,
     private val repo: VehicleRepository
 ) : ViewModel() {
 
@@ -24,8 +24,8 @@ class MapViewModel(
 
     init {
         channel = Channel()
-        GlobalScope.launch(BG) {
-            channel.throttle(context = BG).consumeEach {
+        handler.launch {
+            channel.throttle().consumeEach {
                 loadData(it)
             }
         }
@@ -34,10 +34,11 @@ class MapViewModel(
     override fun onCleared() {
         super.onCleared()
         channel.close()
+        handler.cancel()
     }
 
     fun onCoordinatesChange(latLngBounds: LatLngBounds) {
-        GlobalScope.launch(BG) {
+        handler.launch {
             try {
                 channel.send(latLngBounds)
             } catch (e: Exception) {
@@ -50,7 +51,7 @@ class MapViewModel(
         val greater = latLngBounds.southwest
         val less = latLngBounds.northeast
 
-        GlobalScope.launch(BG) {
+        handler.launch {
             try {
                 val list = repo.getListVehicle(
                     greater.latitude,
@@ -65,3 +66,4 @@ class MapViewModel(
         }
     }
 }
+
